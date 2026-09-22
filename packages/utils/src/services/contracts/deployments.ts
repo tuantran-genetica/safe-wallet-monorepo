@@ -116,6 +116,13 @@ export const getChainAgnosticAddress = (
 ): string | undefined => {
   if (!deployment) return undefined
 
+  // Chain 94909 is not in safe-deployments and our contracts are not canonical,
+  // so every lookup below would return an address with no code behind it.
+  if (chainId === LIFEAI_CHAIN_ID) {
+    const lifeaiAddress = LIFEAI_ADDRESSES[deployment.contractName]
+    if (lifeaiAddress) return lifeaiAddress
+  }
+
   const deploymentTypeAddress = deployment.deployments?.[deploymentType]?.address
   const networkAddresses = toNetworkAddressList(deployment.networkAddresses?.[chainId] ?? [])
 
@@ -563,3 +570,26 @@ export const resolveChainAgnosticContractAddresses = (
 
   return resolved as ContractNetworkConfig
 }
+
+
+/**
+ * Chain 94909 (lifeaitest) contracts. Absent from @safe-global/safe-deployments,
+ * and deployed via Arachnid CREATE2 so not on the canonical addresses either.
+ * Keyed by the `contractName` field of safe-deployments' asset files.
+ * Safe (the L1 singleton) is deliberately absent: we only deployed SafeL2, and
+ * callers that ask for it fall through to the canonical address, which keeps
+ * their "no deployment found" guards happy without ever being used on an L2 chain.
+ */
+const LIFEAI_CHAIN_ID = '94909'
+
+const LIFEAI_ADDRESSES: Record<string, string> = {
+  SafeL2: '0xBCD84ddE147F03C8020f35F81223D27e2dd0C342',
+  SafeProxyFactory: '0xd589322e9558B1499D876472918Ab9Ec06D7Fc11',
+  CompatibilityFallbackHandler: '0x23b83B6E0E7A5678C46B846F8382c384bd65B935',
+  MultiSend: '0x68925e81016276eb5f600CE8b4e6f483179D73b3',
+  MultiSendCallOnly: '0xD6b83842D741599c1476507e38e843dDDe7558A0',
+  SignMessageLib: '0x817203e71d3f7344280e28d69294903F105822eC',
+  CreateCall: '0x8a1366CC001a84C3c16a5837a13b38EefAB2B55F',
+  SimulateTxAccessor: '0xe1f6F502e974e992c91ACcb2b922b479d629Ee55',
+}
+

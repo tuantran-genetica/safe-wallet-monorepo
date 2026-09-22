@@ -49,13 +49,11 @@ const walletConnectV2 = () => {
   })
 }
 
+// Injected browser wallets only on the Life AI devnet. See patch-wallets.py in
+// life-devops safe/ui for why the other modules are removed here and not through
+// the config service.
 const WALLET_MODULES: Partial<{ [_key in WALLET_KEYS]: (chain: Chain) => WalletInit }> = {
   [WALLET_KEYS.INJECTED]: () => injectedWalletModule() as WalletInit,
-  [WALLET_KEYS.WALLETCONNECT_V2]: () => walletConnectV2() as WalletInit,
-  [WALLET_KEYS.COINBASE]: () => coinbaseModule({ darkMode: prefersDarkMode() }) as WalletInit,
-  [WALLET_KEYS.LEDGER]: () => ledgerModule(),
-  [WALLET_KEYS.TREZOR]: () => trezorModule(),
-  [WALLET_KEYS.PK]: (chain) => pkModule(chain.chainId, chain.rpcUri) as WalletInit,
 }
 
 export const getAllWallets = (chain: Chain): WalletInits => {
