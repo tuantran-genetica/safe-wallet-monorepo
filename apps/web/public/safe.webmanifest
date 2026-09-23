@@ -1,7 +1,7 @@
 {
-  "name": "Safe",
-  "short_name": "Safe",
-  "description": "Safe (prev. Gnosis Safe) is the most trusted platform to manage digital assets on Ethereum and multiple EVMs. Over $40B secured.",
+  "name": "LifeAI Safe Wallet",
+  "short_name": "LifeAI Safe",
+  "description": "LifeAI Safe Wallet is the multi-signature smart account wallet for the Life AI testnet.",
   "icons": [
     {
       "src": "/favicons/android-chrome-192x192.png",

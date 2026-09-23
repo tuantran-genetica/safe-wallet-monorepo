@@ -38,9 +38,9 @@
   }
 }
 
-/* Dark-mode logo: mask the SVG and fill with the theme primary (green in dark mode), mirroring SafeLogo. */
+/* Dark-mode logo: mask the SVG and fill with the Life AI cream, mirroring SafeLogo. */
 .logoDarkFill {
-  background-color: var(--primary);
+  background-color: #FBF5EC;
   mask: url(/images/logo-no-text.svg) center / contain no-repeat;
   -webkit-mask: url(/images/logo-no-text.svg) center / contain no-repeat;
 }
