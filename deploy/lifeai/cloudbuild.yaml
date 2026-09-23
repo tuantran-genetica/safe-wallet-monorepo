@@ -16,6 +16,8 @@ steps:
       - NEXT_PUBLIC_DEFAULT_MAINNET_CHAIN_ID=${_CHAIN_ID}
       - --build-arg
       - NEXT_PUBLIC_SAFE_VERSION=${_SAFE_VERSION}
+      - --build-arg
+      - NEXT_PUBLIC_BRAND_NAME=${_BRAND_NAME}
       - --tag
       - ${_IMAGE}:${_TAG_PREFIX}-${SHORT_SHA}
       - --tag
@@ -31,6 +33,7 @@ substitutions:
   _GATEWAY_URL: https://safe-api-devnet-k44qyb6rgq-as.a.run.app/cgw
   _CHAIN_ID: "94909"
   _SAFE_VERSION: "1.4.1"
+  _BRAND_NAME: LifeAI Safe Wallet
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: E2_HIGHCPU_8
