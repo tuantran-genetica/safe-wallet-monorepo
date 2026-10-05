@@ -1,9 +1,9 @@
 # Cloud Build config for the Life AI devnet Safe UI.
 #
-# A Cloud Build trigger runs this on every push to dev. It builds the image and
-# pushes two tags: an immutable one for Pulumi to pin, and a moving `dev` tag.
-# It does not deploy. Deployment stays an explicit `pulumi up --refresh` in the
-# life-devops repository, because Pulumi owns the image field for this service.
+# A Cloud Build trigger runs this on every push to dev. It builds the image,
+# pushes two tags (an immutable one and a moving `dev` tag), then deploys the
+# immutable tag to Cloud Run. The life-devops Pulumi project ignores the live
+# image, so `pulumi up --refresh` there does not revert this deploy.
 steps:
   - name: gcr.io/cloud-builders/docker
     args:
@@ -23,6 +23,20 @@ steps:
       - --tag
       - ${_IMAGE}:${_TAG_PREFIX}
       - .
+  # `images:` pushes only after every step ends, so push before the deploy.
+  - name: gcr.io/cloud-builders/docker
+    args: [push, "${_IMAGE}:${_TAG_PREFIX}-${SHORT_SHA}"]
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - ${_SERVICE_NAME}
+      - --image=${_IMAGE}:${_TAG_PREFIX}-${SHORT_SHA}
+      - --region=${_DEPLOY_REGION}
+      - --update-labels=commit-sha=${COMMIT_SHA},gcb-build-id=${BUILD_ID}
+      - --quiet
 images:
   - ${_IMAGE}:${_TAG_PREFIX}-${SHORT_SHA}
   - ${_IMAGE}:${_TAG_PREFIX}
@@ -34,6 +48,10 @@ substitutions:
   _CHAIN_ID: "94909"
   _SAFE_VERSION: "1.4.1"
   _BRAND_NAME: LifeAI Safe Wallet
+  _SERVICE_NAME: safe-ui-devnet
+  _DEPLOY_REGION: asia-southeast1
 options:
   logging: CLOUD_LOGGING_ONLY
+  # Trigger-level substitutions that this file does not use must not fail the build.
+  substitutionOption: ALLOW_LOOSE
   machineType: E2_HIGHCPU_8
